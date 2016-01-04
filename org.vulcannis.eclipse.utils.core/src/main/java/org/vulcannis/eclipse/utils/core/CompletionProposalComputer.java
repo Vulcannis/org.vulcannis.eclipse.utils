@@ -25,10 +25,12 @@ public class CompletionProposalComputer implements IJavaCompletionProposalComput
         if( context instanceof JavaContentAssistInvocationContext ) {
             final JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext)context;
             final CompilationUnit ast = SharedASTProvider.getAST( javaContext.getCompilationUnit( ), SharedASTProvider.WAIT_NO, monitor );
-            final ASTNode coveringNode = NodeFinder.perform( ast, javaContext.getInvocationOffset( ), 0 );
-            if( coveringNode instanceof TypeDeclaration ) {
-                final ICompletionProposal proposal = new ASTRewriteCorrectionProposal( "New initializing constructor", javaContext.getCompilationUnit( ), NewInitializingConstructorProcessor.getInitializingRewrite( (TypeDeclaration)coveringNode, javaContext.getProject( ) ), 1000, JavaPluginImages.get( JavaPluginImages.IMG_CORRECTION_ADD ) );
-                return singletonList( proposal );
+            if( ast != null ) {
+                final ASTNode coveringNode = NodeFinder.perform( ast, javaContext.getInvocationOffset( ), 0 );
+                if( coveringNode instanceof TypeDeclaration ) {
+                    final ICompletionProposal proposal = new ASTRewriteCorrectionProposal( "New initializing constructor", javaContext.getCompilationUnit( ), NewInitializingConstructorProcessor.getInitializingRewrite( (TypeDeclaration)coveringNode, javaContext.getProject( ) ), 1000, JavaPluginImages.get( JavaPluginImages.IMG_CORRECTION_ADD ) );
+                    return singletonList( proposal );
+                }
             }
         }
         return emptyList( );
