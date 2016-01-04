@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>org.vulcannis.eclipse.utils</groupId>
 	<artifactId>org.vulcannis.eclipse.utils</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>org.vulcannis.eclipse.utils :: parent</name>
 	<description>org.vulcannis.eclipse.utils parent</description>
@@ -20,13 +19,13 @@
 		<module>org.vulcannis.eclipse.utils.feature</module>
 		<module>org.vulcannis.eclipse.utils.site</module>
 	</modules>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<tycho.version>0.24.0</tycho.version>
 		<tycho.extras.version>0.24.0</tycho.extras.version>
-		<tycho.test.platformArgs />
+		<tycho.test.platformArgs/>
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
 	</properties>
 
@@ -69,6 +68,11 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-versions-plugin</artifactId>
+				<version>${tycho.version}</version>
+			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -88,8 +92,7 @@
 					<configuration>
 						<useUIHarness>true</useUIHarness>
 						<argLine>${tycho.test.jvmArgs}</argLine>
-						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to 
-							finish -->
+						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to finish -->
 						<forkedProcessTimeoutInSeconds>60</forkedProcessTimeoutInSeconds>
 						<failIfNoTests>false</failIfNoTests>
 					</configuration>
@@ -150,5 +153,5 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 </project>

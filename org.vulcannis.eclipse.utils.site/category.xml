@@ -6,7 +6,7 @@
    <feature url="features/org.vulcannis.eclipse.utils.feature.source_0.0.0.jar" id="org.vulcannis.eclipse.utils.feature.source" version="0.0.0">
       <category name="org.vulcannis.eclipse.utils Developer Resources"/>
    </feature>
-   <feature url="features/org.vulcannis.eclipse.utils.feature_1.0.0.qualifier.jar" id="org.vulcannis.eclipse.utils.feature" version="1.0.0.qualifier">
+   <feature url="features/org.vulcannis.eclipse.utils.feature_1.0.1.qualifier.jar" id="org.vulcannis.eclipse.utils.feature" version="1.0.1.qualifier">
       <category name="vulcannis.eclipse.utilities"/>
    </feature>
    <category-def name="vulcannis.eclipse.utilities" label="Vulcannis&apos; Eclipse Utilities">
