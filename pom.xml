@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.vulcannis.eclipse.utils</groupId>
 	<artifactId>org.vulcannis.eclipse.utils</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>org.vulcannis.eclipse.utils :: parent</name>
 	<description>org.vulcannis.eclipse.utils parent</description>
@@ -23,17 +24,17 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho.version>1.0.0</tycho.version>
-		<tycho.extras.version>1.0.0</tycho.extras.version>
+		<tycho.version>1.2.0</tycho.version>
+		<tycho.extras.version>1.2.0</tycho.extras.version>
 		<tycho.test.platformArgs />
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>neon</id>
+			<id>2018-09</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/neon</url>
+			<url>http://download.eclipse.org/releases/2018-09</url>
 		</repository>
 	</repositories>
 
@@ -79,6 +80,15 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-versions-plugin</artifactId>
 				<version>${tycho.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<compilerArgument>-warn:+discouraged,forbidden</compilerArgument>
+					<useProjectSettings>false</useProjectSettings>
+				</configuration>
 			</plugin>
 		</plugins>
 
