@@ -14,3 +14,7 @@ Simply run :
     mvn install
 
 The first run will take quite a while since maven will download all the required dependencies in order to build everything.
+
+# Installing
+
+Once built, install the `org.vulcannis.eclipse.utils Feature` from the `org.vulcannis.eclipse.utils.site/target` directory using Eclipse's _Help->Install New Software_ menu item.

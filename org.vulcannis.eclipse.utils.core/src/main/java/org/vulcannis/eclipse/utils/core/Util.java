@@ -1,16 +1,15 @@
 package org.vulcannis.eclipse.utils.core;
 
-import java.util.*;
+import java.util.List;
 
-import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.rewrite.*;
-import org.eclipse.jdt.internal.corext.codemanipulation.StubUtility;
-import org.eclipse.jdt.internal.ui.text.correction.ASTResolving;
 
-@SuppressWarnings( "restriction" )
 public class Util
 {
+    private static final String NAME_PREFIX = "org.eclipse.jdt.ui.";
+    public static final String IMG_CORRECTION_ADD = NAME_PREFIX + "add_correction.gif";
+
     public static IVariableBinding getAssignedVariable( final Expression expression )
     {
         switch( expression.getNodeType( ) ) {
@@ -98,21 +97,5 @@ public class Util
             }
         }
         return modifiers;
-    }
-
-    /**
-     * Lifted from AssignToVariableAssistProposal.
-     */
-    public static String[ ] suggestLocalVariableNames( final ITypeBinding binding, final Expression expression, final IJavaProject project )
-    {
-        return StubUtility.getVariableNameSuggestions( NamingConventions.VK_LOCAL, project, binding, expression, getUsedVariableNames( expression ) );
-    }
-
-    /**
-     * Lifted from AssignToVariableAssistProposal.
-     */
-    public static List< String > getUsedVariableNames( final ASTNode atLocation )
-    {
-        return Arrays.asList( ASTResolving.getUsedVariableNames( atLocation ) );
     }
 }

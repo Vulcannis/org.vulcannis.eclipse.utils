@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.vulcannis.eclipse.utils Core Plugin
 Bundle-SymbolicName: org.vulcannis.eclipse.utils.core;singleton:=true
-Bundle-Version: 1.1.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-16
 Import-Package: com.google.common.base,
  com.google.common.collect,
  org.eclipse.core.resources,
@@ -17,6 +17,7 @@ Import-Package: com.google.common.base,
  org.eclipse.jdt.core.compiler,
  org.eclipse.jdt.core.dom,
  org.eclipse.jdt.core.dom.rewrite,
+ org.eclipse.jdt.core.manipulation,
  org.eclipse.jdt.internal.corext.codemanipulation,
  org.eclipse.jdt.internal.corext.dom,
  org.eclipse.jdt.internal.corext.util,
@@ -46,3 +47,4 @@ Import-Package: com.google.common.base,
  org.w3c.dom
 Require-Bundle: org.eclipse.m2e.maven.runtime
 Bundle-Vendor: Vulcannis
+Automatic-Module-Name: org.vulcannis.eclipse.utils.core

@@ -2,7 +2,7 @@
 <feature
       id="org.vulcannis.eclipse.utils.feature"
       label="org.vulcannis.eclipse.utils Feature"
-      version="1.1.0.qualifier"
+      version="1.2.0.qualifier"
       provider-name="Vulcannis">
 
    <description>
@@ -10,7 +10,7 @@
    </description>
 
    <copyright>
-      Copyright 2015 Kory Markevich
+      Copyright 2015-2021 Kory Markevich
    </copyright>
 
    <license url="http://www.apache.org/licenses/LICENSE-2.0.html">

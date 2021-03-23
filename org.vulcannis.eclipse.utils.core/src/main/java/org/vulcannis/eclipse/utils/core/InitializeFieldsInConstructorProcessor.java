@@ -3,13 +3,14 @@ package org.vulcannis.eclipse.utils.core;
 import static java.util.Collections.emptyList;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.rewrite.*;
 import org.eclipse.jdt.internal.corext.dom.*;
-import org.eclipse.jdt.internal.ui.JavaPluginImages;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.text.java.*;
 import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
 import org.eclipse.swt.graphics.Image;
@@ -49,7 +50,7 @@ public class InitializeFieldsInConstructorProcessor implements IQuickFixProcesso
             return new IJavaCompletionProposal[ 0 ];
         } else {
             final String label = "Add parameters to constructors";
-            final Image image = JavaPluginImages.get( JavaPluginImages.IMG_CORRECTION_ADD );
+            final Image image = JavaUI.getSharedImages( ).getImage( Util.IMG_CORRECTION_ADD );
             return new IJavaCompletionProposal[ ] {
                 new ASTRewriteCorrectionProposal( label, context.getCompilationUnit( ), null, 1, image ) {
                     private ASTRewrite rewrite = null;
@@ -61,9 +62,7 @@ public class InitializeFieldsInConstructorProcessor implements IQuickFixProcesso
                             final AST ast = typeDeclaration.getAST( );
                             rewrite = ASTRewrite.create( ast );
 
-                            for( final ConstructorEntry constructor: constructors.keySet( ) ) {
-                                rewriteConstructor( rewrite, constructor, order( constructors.get( constructor ), finalFields ) );
-                            }
+                            constructors.keySet( ).forEach( constructor -> rewriteConstructor( rewrite, constructor, order( constructors.get( constructor ), finalFields ) ) );
                         }
                         return rewrite;
                     }
@@ -86,9 +85,7 @@ public class InitializeFieldsInConstructorProcessor implements IQuickFixProcesso
             statementRewrite.insertAt( assignmentStatement, insertIndex, null );
         }
 
-        for( final ConstructorEntry element: entry.children ) {
-            rewriteChainConstructor( rewrite, element, variables );
-        }
+        entry.children.forEach( element -> rewriteChainConstructor( rewrite, element, variables ) );
     }
 
     private void rewriteChainConstructor( final ASTRewrite rewrite, final ConstructorEntry entry, final List< VariableDeclarationFragment > variables )
@@ -102,9 +99,7 @@ public class InitializeFieldsInConstructorProcessor implements IQuickFixProcesso
             final ListRewrite argumentRewrite = rewrite.getListRewrite( superCall, ConstructorInvocation.ARGUMENTS_PROPERTY );
             argumentRewrite.insertLast( superArgument, null );
         }
-        for( final ConstructorEntry element: entry.children ) {
-            rewriteChainConstructor( rewrite, element, variables );
-        }
+        entry.children.forEach( element -> rewriteChainConstructor( rewrite, element, variables ) );
     }
 
     private SetMultimap< ConstructorEntry, VariableDeclarationFragment > getConstructors( final TypeDeclaration typeDeclaration, final List< VariableDeclarationFragment > finalFields )
@@ -148,29 +143,19 @@ public class InitializeFieldsInConstructorProcessor implements IQuickFixProcesso
     private List< VariableDeclarationFragment > getUninitializedFinalFields( final TypeDeclaration typeDeclaration )
     {
         final FieldDeclaration[ ] allFields = typeDeclaration.getFields( );
-        final List< VariableDeclarationFragment > finalFields = Lists.newArrayList( );
-        for( final FieldDeclaration field: allFields ) {
-            final int modifiers = field.getModifiers( );
-            if( Modifier.isFinal( modifiers ) && !Modifier.isStatic( modifiers ) ) {
-                for( final VariableDeclarationFragment fragment: (List< VariableDeclarationFragment >)field.fragments( ) ) {
-                    if( fragment.getInitializer( ) == null ) {
-                        finalFields.add( fragment );
-                    }
-                }
-            }
-        }
-        return finalFields;
+
+        return Stream.of( allFields )
+            .filter( field -> Modifier.isFinal( field.getModifiers( ) ) && !Modifier.isStatic( field.getModifiers( ) ) )
+            .flatMap( field -> ( (List< VariableDeclarationFragment >)field.fragments( ) ).stream( ) )
+            .filter( fragment -> fragment.getInitializer( ) == null )
+            .toList( );
     }
 
     private static List< VariableDeclarationFragment > order( final Set< VariableDeclarationFragment > variables, final List< VariableDeclarationFragment > order )
     {
-        final List< VariableDeclarationFragment > orderedVariables = Lists.newArrayListWithExpectedSize( variables.size( ) );
-        for( final VariableDeclarationFragment fragment: order ) {
-            if( variables.contains( fragment ) ) {
-                orderedVariables.add( fragment );
-            }
-        }
-        return orderedVariables;
+        return order.stream( )
+            .filter( variables::contains )
+            .toList( );
     }
 
     private static Statement getFirstStatement( final Block statement )

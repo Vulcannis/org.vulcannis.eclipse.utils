@@ -5,14 +5,10 @@
 
 	<groupId>org.vulcannis.eclipse.utils</groupId>
 	<artifactId>org.vulcannis.eclipse.utils</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>org.vulcannis.eclipse.utils :: parent</name>
 	<description>org.vulcannis.eclipse.utils parent</description>
-
-	<prerequisites>
-		<maven>3.0</maven>
-	</prerequisites>
 
 	<modules>
 		<module>org.vulcannis.eclipse.utils.core</module>
@@ -24,17 +20,16 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho.version>1.2.0</tycho.version>
-		<tycho.extras.version>1.2.0</tycho.extras.version>
+		<tycho.version>2.2.0</tycho.version>
 		<tycho.test.platformArgs />
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>2018-09</id>
+			<id>2021-03</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/2018-09</url>
+			<url>https://download.eclipse.org/releases/2021-03</url>
 		</repository>
 	</repositories>
 
@@ -45,6 +40,16 @@
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho.version}</version>
 				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<!-- The version of ECJ in Tycho doesn't seem to accept 16. -->
+					<source>15</source>
+					<target>15</target>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -61,6 +66,9 @@
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
+					<!-- Shouldn't need this. Only gets past the target execution environment 
+						req check failure, compiler still can't find JDK 16 classes -->
+					<executionEnvironmentDefault>JavaSE-16</executionEnvironmentDefault>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -69,9 +77,15 @@
 				<version>${tycho.version}</version>
 				<executions>
 					<execution>
-						<id>attach-source</id>
+						<id>plugin-source</id>
 						<goals>
 							<goal>plugin-source</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>feature-source</id>
+						<goals>
+							<goal>feature-source</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -83,12 +97,17 @@
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
+				<artifactId>tycho-p2-plugin</artifactId>
 				<version>${tycho.version}</version>
-				<configuration>
-					<compilerArgument>-warn:+discouraged,forbidden</compilerArgument>
-					<useProjectSettings>false</useProjectSettings>
-				</configuration>
+				<executions>
+					<execution>
+						<id>attach-p2-metadata</id>
+						<phase>package</phase>
+						<goals>
+							<goal>p2-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 
@@ -109,7 +128,8 @@
 					<configuration>
 						<useUIHarness>true</useUIHarness>
 						<argLine>${tycho.test.jvmArgs}</argLine>
-						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to finish -->
+						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to 
+							finish -->
 						<forkedProcessTimeoutInSeconds>60</forkedProcessTimeoutInSeconds>
 						<failIfNoTests>false</failIfNoTests>
 					</configuration>
@@ -129,46 +149,5 @@
 				<tycho.test.platformArgs>-XstartOnFirstThread</tycho.test.platformArgs>
 			</properties>
 		</profile>
-		<profile>
-			<id>source-feature</id>
-			<activation>
-				<file>
-					<exists>feature.xml</exists>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.tycho.extras</groupId>
-						<artifactId>tycho-source-feature-plugin</artifactId>
-						<version>${tycho.extras.version}</version>
-						<executions>
-							<execution>
-								<id>source-feature</id>
-								<phase>package</phase>
-								<goals>
-									<goal>source-feature</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-p2-plugin</artifactId>
-						<version>${tycho.version}</version>
-						<executions>
-							<execution>
-								<id>attach-p2-metadata</id>
-								<phase>package</phase>
-								<goals>
-									<goal>p2-metadata</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
-
 </project>

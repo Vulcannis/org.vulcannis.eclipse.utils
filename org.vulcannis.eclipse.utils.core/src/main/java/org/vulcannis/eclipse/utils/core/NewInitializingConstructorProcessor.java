@@ -9,7 +9,7 @@ import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.rewrite.*;
 import org.eclipse.jdt.internal.corext.dom.*;
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
-import org.eclipse.jdt.internal.ui.JavaPluginImages;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.text.java.*;
 import org.eclipse.jdt.ui.text.java.correction.ASTRewriteCorrectionProposal;
 import org.eclipse.swt.graphics.Image;
@@ -31,32 +31,30 @@ public class NewInitializingConstructorProcessor implements IQuickAssistProcesso
         if( context.getSelectionLength( ) == 0 && coveringNode instanceof TypeDeclaration ) {
             final TypeDeclaration declaration = (TypeDeclaration)coveringNode;
 
-            final Image image = JavaPluginImages.get( JavaPluginImages.IMG_CORRECTION_ADD );
+            final Image image = JavaUI.getSharedImages( ).getImage( Util.IMG_CORRECTION_ADD );
             final ICompilationUnit compilationUnit = context.getCompilationUnit( );
 
-            // TODO if initializing is empty, don't include
-            return new ASTRewriteCorrectionProposal[ ] {
-                new ASTRewriteCorrectionProposal( "New empty constructor", compilationUnit, getEmptyRewrite( declaration ), 1, image ),
-                new ASTRewriteCorrectionProposal( "New initializing constructor", compilationUnit, getInitializingRewrite( declaration, compilationUnit.getJavaProject( ) ), 2, image ),
-            };
+            return getInitializingRewrite( declaration, compilationUnit.getJavaProject( ) )
+                .map( rewrite -> new ASTRewriteCorrectionProposal( "New initializing constructor", compilationUnit, rewrite, 2, image ) )
+                .map( proposal -> new ASTRewriteCorrectionProposal[ ] { proposal } )
+                .orElse( null );
         }
         return null;
     }
 
-    public static ASTRewrite getEmptyRewrite( final TypeDeclaration declaration )
+    public static Optional< ASTRewrite > getInitializingRewrite( final TypeDeclaration declaration, final IJavaProject project )
     {
-        return new ConstructorRewriter( declaration ).getRewrite( );
-    }
+        assert declaration != null;
+        assert project != null;
 
-    public static ASTRewrite getInitializingRewrite( final TypeDeclaration declaration, final IJavaProject project )
-    {
-        return new ConstructorRewriter( declaration ) {
+        final List< SingleVariableDeclaration > uninitializedFinals = getUnitinitializedFinalFields( declaration );
+        if( uninitializedFinals.isEmpty( ) ) {
+            return Optional.empty( );
+        }
+        return Optional.of( new ConstructorRewriter( declaration ) {
             @Override
             protected void createConstructor( )
             {
-                assert declaration != null;
-                assert project != null;
-
                 final List< SingleVariableDeclaration > minimalSuperConstructor = getMinimalSuperConstructorArguments( declaration, project );
                 final List< Statement > statements = body.statements( );
                 if( !minimalSuperConstructor.isEmpty( ) ) {
@@ -70,16 +68,13 @@ public class NewInitializingConstructorProcessor implements IQuickAssistProcesso
                     }
                 }
 
-                final List< SingleVariableDeclaration > uninitializedFinals = getUnitinitializedFinalFields( declaration );
-                if( !uninitializedFinals.isEmpty( ) ) {
-                    final List< SingleVariableDeclaration > parameters = constructor.parameters( );
-                    parameters.addAll( uninitializedFinals );
-                    for( final SingleVariableDeclaration argumentDeclaration: uninitializedFinals ) {
-                        statements.add( Util.createFieldAssignmentStatement( ast, argumentDeclaration.getName( ) ) );
-                    }
+                final List< SingleVariableDeclaration > parameters = constructor.parameters( );
+                parameters.addAll( uninitializedFinals );
+                for( final SingleVariableDeclaration argumentDeclaration: uninitializedFinals ) {
+                    statements.add( Util.createFieldAssignmentStatement( ast, argumentDeclaration.getName( ) ) );
                 }
             }
-        }.getRewrite( );
+        }.getRewrite( ) );
     }
 
     private static List< SingleVariableDeclaration > getUnitinitializedFinalFields( final TypeDeclaration declaration )
